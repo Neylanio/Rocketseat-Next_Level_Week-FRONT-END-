@@ -5,6 +5,15 @@
     margin: 0 auto;
   }
   
+  #page-create-point #info{
+    margin-left: auto;
+  }
+
+  #page-create-point #obrigatoryImage{
+    padding-top: 15px;
+    margin-right: auto;
+  }
+
   #page-create-point header {
     margin-top: 48px;
   

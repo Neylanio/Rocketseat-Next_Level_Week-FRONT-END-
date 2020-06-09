@@ -6,6 +6,8 @@ import { LeafletMouseEvent } from 'leaflet';
 import api from '../../services/api';
 import axios from 'axios';
 
+import Dropzone from '../../components/Dropzone/index';
+
 import logo from '../../assets/logo.svg';
 
 import './styles.css';
@@ -45,6 +47,7 @@ const CreatePoint = () => {
     const [ selectedUf, setSelectedUf ] = useState('0');
     const [ selectedCity, setSelectedCity ] = useState('0');
     const [ selectedPosition, setSelectedPosition ] = useState<[number, number]>([0,0]);
+    const [ selectedFile, setSelectedFile ] = useState<File>()
 
     const history = useHistory();
 
@@ -132,25 +135,31 @@ const CreatePoint = () => {
         const [ latitude, longitude ] = selectedPosition;
         const items = selectedItems;
 
-        const data = {
-            name,
-            email,
-            whatsapp,
-            uf,
-            city,
-            latitude,
-            longitude,
-            items
-        };
+        const data = new FormData();
 
-        await api.post("points", data);
+        data.append('name', name);
+        data.append('email', email);
+        data.append('whatsapp', whatsapp);
+        data.append('uf', uf);
+        data.append('city', city);
+        data.append('latitude', String(latitude));
+        data.append('longitude', String(longitude));
+        data.append('items', items.join(','));
+        
+        if(selectedFile){
+            data.append('image', selectedFile);
+        } 
 
-        alert('Ponto de coleta criado!!');
-        // window.open(pagina, '', ',type=fullWindow,fullscreen,scrollbars=yes, menubar=no');
-        // setTimeout(function(){ 
-            history.push('/');                
-        // }, 2000);
-
+        try{
+            await api.post("points", data);
+            alert('Ponto de coleta criado!!')
+            // window.open(pagina, '', ',type=fullWindow,fullscreen,scrollbars=yes, menubar=no');
+            // setTimeout(function(){ 
+                history.push('/');                
+            // }, 2000);
+        }catch(e){
+            alert('Digite todos os campos obrigatórios');
+        }
     }
 
     return(
@@ -163,23 +172,33 @@ const CreatePoint = () => {
                 </Link>
             </header>
             <form onSubmit={handleSubmit}>
+
+                <h1>Cadastro do <br /> ponto de coleta</h1>
+
+                <p id="info">Campos Obrigatórios *</p>
+                
+                <Dropzone 
+                    onFileUploaded={setSelectedFile}
+                />
+                <p id="obrigatoryImage"> OBS: Imagem obrigatória </p>
+
                 <fieldset>
                     <legend>
-                        <h2>Dados</h2>
+                        <h2>Dados *</h2>
                     </legend>
 
                     <div className="field">
-                        <label htmlFor="name">Nome da entidade</label>
+                        <label htmlFor="name">Nome *</label>
                         <input type="text" name="name" id="name" onChange={handleInputChange}/>
                     </div>
 
                     <div className="field-group">
                         <div className="field">
-                            <label htmlFor="email">E-mail</label>
+                            <label htmlFor="email">E-mail *</label>
                             <input type="email" name="email" id="email" onChange={handleInputChange}/>
                         </div>
                         <div className="field">
-                            <label htmlFor="whatsapp">Whatsapp</label>
+                            <label htmlFor="whatsapp">Whatsapp *</label>
                             <input type="text" name="whatsapp" id="whatsapp" onChange={handleInputChange}/>
                         </div>
 
@@ -189,7 +208,7 @@ const CreatePoint = () => {
 
                 <fieldset>
                     <legend>
-                        <h2>Endereço</h2>
+                        <h2>Endereço *</h2>
                         <span>Selecione o endereço no mapa</span>
                     </legend>
 
@@ -204,7 +223,7 @@ const CreatePoint = () => {
 
                     <div className="field-group">
                         <div className="field">
-                            <label htmlFor="uf">Estado (UF)</label>
+                            <label htmlFor="uf">Estado (UF) *</label>
                             <select name="uf" id="uf" value={selectedUf} onChange={handleSelectUf}>
                             <option value="0">Selecione uma UF</option>
                                 {ufs.map(uf => (
@@ -214,7 +233,7 @@ const CreatePoint = () => {
                         </div>
 
                         <div className="field">
-                            <label htmlFor="city">Cidade</label>
+                            <label htmlFor="city">Cidade *</label>
                             <select name="city" id="city" value={selectedCity} onChange={handleSelectCity}>
                                 <option value="0">Selecione uma cidade</option>
                                 {cities.map(city => (
@@ -227,7 +246,7 @@ const CreatePoint = () => {
 
                 <fieldset>
                     <legend>
-                        <h2>Itens de coleta</h2>
+                        <h2>Itens de coleta *</h2>
                         <span>Selecione um ou mais itens abaixo</span>
                     </legend>
 
