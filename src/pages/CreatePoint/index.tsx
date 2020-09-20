@@ -169,7 +169,7 @@ const CreatePoint: React.FC = () => {
                 <img src={logo} alt="Ecoleta" />
                 <Link to="/">
                     <FiArrowLeft /> 
-                    Voltar p/ Home
+                    Voltar
                 </Link>
             </Header>
             <Form onSubmit={handleSubmit}>
